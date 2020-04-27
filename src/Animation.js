@@ -1,5 +1,4 @@
 import React from 'react';
-import AnimationManager from "./AnimationManager";
 
 export default class Animation {
 

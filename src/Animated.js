@@ -9,13 +9,8 @@ class AnimatedBase extends React.Component {
   }
 
   componentDidMount() {
-    let instance;
-    Object.keys(this.props.style).forEach(cssProp => {
-      instance = this.props.style[cssProp];
-      if(typeof instance.run === 'function') {
-        instance.instance.addCallbackWithKey(cssProp, instance.run(this._ref.current, cssProp));
-      }
-    });
+    let instance = null;
+    mapCallbacks.call(this, instance);
   }
 
   componentDidUpdate(prevProps) {
@@ -28,12 +23,7 @@ class AnimatedBase extends React.Component {
         }
       });
 
-      Object.keys(this.props.style).forEach(cssProp => {
-        instance = this.props.style[cssProp];
-        if(typeof instance.run === 'function') {
-          instance.instance.addCallbackWithKey(cssProp, instance.run(this._ref.current, cssProp));
-        }
-      });
+      mapCallbacks.call(this, instance);
     }
   }
 
@@ -53,6 +43,15 @@ class AnimatedBase extends React.Component {
 
     return React.createElement(type, {...props, style: strip(style), ref: this._ref}, children);
   }
+}
+
+function mapCallbacks(instance) {
+  Object.keys(this.props.style).forEach(cssProp => {
+    instance = this.props.style[cssProp];
+    if(typeof instance.run === 'function') {
+      instance.instance.addCallbackWithKey(cssProp, instance.run(this._ref.current, cssProp));
+    }
+  });
 }
 
 function strip(style) {
