@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "",
   "main": "./dist/spring.cjs.js",
+  "exports": {
+    ".": "./dist/spring.esm.js"
+  },
   "scripts": {
     "start": "BABEL_ENV=build rollup -c ./rollup.config.js --watch",
     "build": "BABEL_ENV=build rollup -c ./rollup.config.js --compact",

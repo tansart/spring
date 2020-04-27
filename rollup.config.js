@@ -16,6 +16,10 @@ export default {
     {
       file: './dist/Spring.cjs.js',
       format: 'cjs',
+    },
+    {
+      file: './dist/Spring.esm.js',
+      format: 'es',
     }
   ],
   external: ['react'],
