@@ -39,9 +39,12 @@ class AnimatedBase extends React.Component {
   }
 
   render() {
-    const {children, type, animatedProps, style, ...props} = this.props;
+    const { animatedProps, children, forwaredRef, style, type, ...props } = this.props;
 
-    return React.createElement(type, {...props, style: strip(style), ref: this._ref}, children);
+    return React.createElement(type, {...props, style: strip(style), ref: (el) => {
+        forwaredRef ? (forwaredRef.current = el): null;
+        this._ref.current = el;
+      }}, children)
   }
 }
 
@@ -67,7 +70,7 @@ const AnimatedInstances = {};
 export default new Proxy(AnimatedBase, {
   get(obj, type) {
     return AnimatedInstances[type] || (AnimatedInstances[type] = React.forwardRef(({children, ...props}, ref) => (
-      <AnimatedBase ref={ref} type={type} {...props}>
+      <AnimatedBase forwaredRef={ref} type={type} {...props}>
         {children}
       </AnimatedBase>
     )));
