@@ -65,6 +65,32 @@ export default class Animation {
     }
   }
 
+  get(prop) {
+      if(!this._values.hasOwnProperty(prop)) {
+        return null;
+      }
+
+      return this._values[prop].lastPosition;
+  }
+
+  pause() {
+    for (let prop in this._values) {
+      this._values[prop] = {
+        ...this._values[prop],
+        done: true
+      };
+    }
+  }
+
+  resume() {
+    for (let prop in this._values) {
+      this._values[prop] = {
+        ...this._values[prop],
+        done: false
+      };
+    }
+  }
+
   getValues(i) {
     return this._values[this._keys[i]];
   }
