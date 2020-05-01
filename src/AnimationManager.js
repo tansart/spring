@@ -33,13 +33,15 @@ export default class AnimationManager {
 
   // forked from https://github.com/react-spring/react-spring/blob/master/src/animated/FrameLoop.ts
   update = () => {
+    let lastTime;
+    let isDone;
     let time = Date.now();
 
     for(let i = 0; i < AnimationManager.QUEUE.length; i++) {
       const animation = AnimationManager.QUEUE[i];
       let config = animation.config;
 
-      let lastTime;
+      isDone = true;
 
       for(let j = 0; j < animation.length; j++) {
         const anim = animation.getValues(j);
@@ -47,6 +49,8 @@ export default class AnimationManager {
         if (anim.done) {
           continue;
         }
+
+        isDone = false;
 
         let to = anim.toValue;
         let position = anim.lastPosition;
@@ -86,13 +90,15 @@ export default class AnimationManager {
           }
 
           anim.done = true;
-        } else {
-
-          // isDone = false;
         }
 
         anim.lastPosition = position;
-        animation.updateValue();
+      }
+
+      animation.updateValue();
+
+      if(isDone) {
+        animation.onEnd();
       }
     }
 

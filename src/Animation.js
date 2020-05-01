@@ -20,6 +20,7 @@ export default class Animation {
       mass: 1,
       precision: 0.01,
       tension: 170,
+      onEnd: noop,
       ...config
     };
 
@@ -44,6 +45,10 @@ export default class Animation {
     this._callbacks.set(key, fn);
   }
 
+  onEnd() {
+    this._config.onEnd();
+  }
+
   updateValue() {
     for (let [key, cb] of this._callbacks) {
       cb(this._values);
@@ -66,9 +71,10 @@ export default class Animation {
   }
 
   get(prop) {
-      if(!this._values.hasOwnProperty(prop)) {
-        return null;
-      }
+      // might need to measure the impact of this call here.
+      // if(!this._values.hasOwnProperty(prop)) {
+      //   return null;
+      // }
 
       return this._values[prop].lastPosition;
   }
@@ -95,3 +101,5 @@ export default class Animation {
     return this._values[this._keys[i]];
   }
 }
+
+function noop() {}
