@@ -12,6 +12,7 @@ export default class Animation {
 
   constructor(values, config) {
     this._callbacks = new Map();
+    this._done = true;
     this._keys = [];
     this._values = {};
     this._config = {
@@ -46,6 +47,7 @@ export default class Animation {
   }
 
   onEnd() {
+    this._done = true;
     this._config.onEnd();
   }
 
@@ -61,6 +63,7 @@ export default class Animation {
         continue;
       }
 
+      this._done = false;
       this._values[val] = {
         ...this._values[val],
         done: false,

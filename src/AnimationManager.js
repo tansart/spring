@@ -97,7 +97,7 @@ export default class AnimationManager {
 
       animation.updateValue();
 
-      if(isDone) {
+      if(isDone && !animation._done) {
         animation.onEnd();
       }
     }
