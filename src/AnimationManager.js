@@ -33,8 +33,9 @@ export default class AnimationManager {
 
   // forked from https://github.com/react-spring/react-spring/blob/master/src/animated/FrameLoop.ts
   update = () => {
-    let lastTime;
+    let endOfAnimation = false;
     let isDone;
+    let lastTime;
     let time = Date.now();
 
     for(let i = 0; i < AnimationManager.QUEUE.length; i++) {
@@ -56,34 +57,48 @@ export default class AnimationManager {
         let position = anim.lastPosition;
         let velocity = config.initialVelocity;
 
-        /** Spring easing */
-        lastTime = anim.lastTime !== void 0 ? anim.lastTime : time
-        velocity =
-          anim.lastVelocity !== void 0
-            ? anim.lastVelocity
-            : config.initialVelocity;
+        if(config.easing) {
+          // Easing
+          if(!anim.startTime) {
+            anim.from = anim.lastPosition;
+            anim.startTime = time;
+          }
 
-        // If we lost a lot of frames just jump to the end.
-        if (time > lastTime + 64) {
-          lastTime = time;
+          position = config.easing((time - anim.startTime) / config.duration) * (to - anim.from);
+          endOfAnimation = time >= anim.startTime + config.duration;
+
+          if(endOfAnimation) {
+            anim.startTime = 0;
+          }
+        } else {
+          // Spring
+          lastTime = anim.lastTime !== void 0 ? anim.lastTime : time
+          velocity =
+            anim.lastVelocity !== void 0
+              ? anim.lastVelocity
+              : config.initialVelocity;
+
+          // If we lost a lot of frames just jump to the end.
+          if (time > lastTime + 64) {
+            lastTime = time;
+          }
+          // http://gafferongames.com/game-physics/fix-your-timestep/
+          let numSteps = Math.floor(time - lastTime);
+          for (let i = 0; i < numSteps; ++i) {
+            let force = -config.tension * (position - to);
+            let damping = -config.friction * velocity;
+            let acceleration = (force + damping) / config.mass;
+            velocity = velocity + (acceleration * 1) / 1000;
+            position = position + (velocity * 1) / 1000;
+          }
+
+          endOfAnimation = Math.abs(velocity) <= config.precision && Math.abs(to - position) <= config.precision;
+
+          anim.lastVelocity = velocity;
+          anim.lastTime = time;
         }
-        // http://gafferongames.com/game-physics/fix-your-timestep/
-        let numSteps = Math.floor(time - lastTime);
-        for (let i = 0; i < numSteps; ++i) {
-          let force = -config.tension * (position - to);
-          let damping = -config.friction * velocity;
-          let acceleration = (force + damping) / config.mass;
-          velocity = velocity + (acceleration * 1) / 1000;
-          position = position + (velocity * 1) / 1000;
-        }
 
-        let isVelocity = Math.abs(velocity) <= config.precision;
-        let isDisplacement = Math.abs(to - position) <= config.precision;
-
-        anim.lastVelocity = velocity;
-        anim.lastTime = time;
-
-        if ((isVelocity && isDisplacement)) {
+        if (endOfAnimation) {
           // Ensure that we end up with a round value
           if (anim.value !== to) {
             position = to;
