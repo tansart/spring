@@ -64,7 +64,7 @@ export default class AnimationManager {
             anim.startTime = time;
           }
 
-          position = config.easing((time - anim.startTime) / config.duration) * (to - anim.from);
+          position = anim.from + config.easing((time - anim.startTime) / config.duration) * (to - anim.from);
           endOfAnimation = time >= anim.startTime + config.duration;
 
           if(endOfAnimation) {
@@ -110,7 +110,7 @@ export default class AnimationManager {
         anim.lastPosition = position;
       }
 
-      animation.updateValue();
+      !isDone && animation.updateValue();
 
       if(isDone && !animation._done) {
         animation.onEnd();

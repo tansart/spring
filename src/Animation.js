@@ -12,7 +12,7 @@ export default class Animation {
 
   constructor(values, config) {
     this._callbacks = new Map();
-    this._done = true;
+    this._done = false;
     this._keys = [];
     this._values = {};
     this._config = {
@@ -44,6 +44,7 @@ export default class Animation {
 
   addCallbackWithKey(key, fn) {
     this._callbacks.set(key, fn);
+    fn(this._values);
   }
 
   onEnd() {
